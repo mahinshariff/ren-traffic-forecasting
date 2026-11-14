@@ -1,0 +1,13 @@
+[
+  {
+    "router": "batonrouge",
+    "rows_scanned": 80056602,
+    "rows_in_window": 79387600,
+    "base_bins": 61920,
+    "empty_bins": 2,
+    "total_packets": 1247187555028.0,
+    "has_bytes": false,
+    "has_addresses": true,
+    "weeks": 7
+  }
+]

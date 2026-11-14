@@ -1,0 +1,27 @@
+\begin{table}[t]
+\caption{Training-free window rule (largest autocorrelation magnitude at the lead time) versus the best window in the forecasting sweep.}
+\label{tab:window_rule}
+\centering
+\begin{tabular}{lcccccc}
+\hline
+\textbf{Router} & \textbf{Lead time} & \textbf{Rule window} & \textbf{|ACF| at lead} & \textbf{Sweep-best window} & \textbf{Model} & \textbf{Match} \\
+\hline
+Dallas & 1 h & 1 h & 0.96 & 1 h & GRU & yes \\
+Dallas & 6 h & 6 h & 0.76 & 6 h & N-HiTS & yes \\
+Dallas & 12 h & 12 h & 0.58 & 12 h & N-HiTS & yes \\
+Dallas & 24 h & 1 day & 0.86 & 12 h & N-HiTS & no \\
+Atlanta & 1 h & 1 h & 0.85 & 1 h & GRU & yes \\
+Atlanta & 6 h & 6 h & 0.39 & 6 h & N-HiTS & yes \\
+Atlanta & 12 h & 30 min & 0.08 & 12 h & N-HiTS & no \\
+Atlanta & 24 h & 4 h & 0.75 & 12 h & N-HiTS & no \\
+El Paso & 1 h & 1 h & 0.85 & 1 h & N-HiTS & yes \\
+El Paso & 6 h & 6 h & 0.66 & 6 h & N-HiTS & yes \\
+El Paso & 12 h & 12 h & 0.51 & 6 h & N-HiTS & no \\
+El Paso & 24 h & 1 day & 0.64 & 12 h & N-HiTS & no \\
+Baton Rouge & 1 h & 1 h & 0.98 & 1 h & GRU & yes \\
+Baton Rouge & 6 h & 6 h & 0.86 & 6 h & N-HiTS & yes \\
+Baton Rouge & 12 h & 12 h & 0.80 & 6 h & LSTM & no \\
+Baton Rouge & 24 h & 1 day & 0.91 & 1 day & N-HiTS & yes \\
+\hline
+\end{tabular}
+\end{table}

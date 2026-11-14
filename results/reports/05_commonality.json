@@ -1,0 +1,6 @@
+{
+  "Median within-router day-over-day top-N Jaccard / random expectation": "11.1",
+  "Median cross-router same-day top-N Jaccard / random expectation": "5.6",
+  "Highest mean same-day top-N Jaccard between two routers": "0.79 (elpaso-phoenix)",
+  "Prefix-based cross-router comparison informative": true
+}

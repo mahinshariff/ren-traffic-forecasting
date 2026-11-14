@@ -1,0 +1,15 @@
+\begin{table}[t]
+\caption{Best aggregation window per router (12 h lead time; mean $\pm$ std over seeds).}
+\label{tab:best_window}
+\centering
+\begin{tabular}{lcccccccc}
+\hline
+\textbf{Router} & \textbf{Best window} & \textbf{Model} & \textbf{Lookback} & \textbf{Best sMAPE (\%)} & \textbf{Worst-window sMAPE (\%)} & \textbf{Gain (\%)} & \textbf{Seasonal naive (\%)} & \textbf{Statistics rule} \\
+\hline
+Dallas & 12 h & N-HiTS & 168 h & 10.7 $\pm$ 1.4 & 25.2 & 57 & 14.3 & 12 h \\
+Atlanta & 12 h & N-HiTS & 168 h & 15.3 $\pm$ 2.5 & 52.9 & 71 & 29.9 & 30 min \\
+El Paso & 6 h & N-HiTS & 24 h & 29.5 $\pm$ 3.8 & 84.2 & 65 & 31.8 & 12 h \\
+Baton Rouge & 6 h & LSTM & 24 h & 29.3 $\pm$ 3.4 & 59.1 & 50 & 31.8 & 12 h \\
+\hline
+\end{tabular}
+\end{table}

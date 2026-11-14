@@ -1,0 +1,17 @@
+\begin{table}[t]
+\caption{Median performance per model over all routers and aggregation windows (12 h lead time).}
+\label{tab:models}
+\centering
+\begin{tabular}{lcccccc}
+\hline
+\textbf{Model} & \textbf{Median sMAPE (\%)} & \textbf{MAPE (\%)} & \textbf{$R^2$} & \textbf{MSLE} & \textbf{P99 APE (\%)} & \textbf{Train time (s)} \\
+\hline
+GRU & 40.38 & 58.34 & -0.11 & 0.32 & 228.11 & 1.44 \\
+Hybrid GRU-LSTM & 42.01 & 60.56 & -0.12 & 0.32 & 239.36 & 1.40 \\
+LSTM & 41.56 & 60.19 & -0.11 & 0.34 & 244.07 & 1.30 \\
+Last value & 58.81 & 71.17 & -1.08 & 0.60 & 325.77 & 0.00 \\
+N-HiTS & 35.68 & 46.67 & 0.21 & 0.27 & 195.27 & 0.49 \\
+Seasonal naive (24 h) & 38.86 & 40.16 & 0.08 & 0.30 & 176.05 & 0.00 \\
+\hline
+\end{tabular}
+\end{table}

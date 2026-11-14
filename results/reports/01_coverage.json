@@ -1,0 +1,6 @@
+{
+  "Selected routers": "dallas, atlanta, elpaso, batonrouge",
+  "Fourth router": "batonrouge",
+  "Study window": "2021-10-08 to 2021-11-19 (43 days)",
+  "Good-day rule": "flows and packets both >= 0.2 \u00d7 the router's median daily value"
+}

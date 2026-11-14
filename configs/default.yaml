@@ -1,0 +1,120 @@
+# ---------------------------------------------------------------------------
+# Study configuration. Every stage reads this file.
+# Paths may contain environment variables ($WORK, $HOME, ...).
+# ---------------------------------------------------------------------------
+
+paths:
+  # Directory with one Parquet file (or dataset directory) per router,
+  # named <router>.parquet, e.g. dallas.parquet.
+  raw_dir: /mnt/nrdstor/ramamurthy/mhnarfth/Datasets/internet2_old_processed/raw_parquet
+  # Everything the pipeline produces goes here (results, predictions, figures,
+  # reports, logs). Use fast scratch/work storage on the cluster.
+  out_dir: $WORK/ren-traffic-forecasting/outputs
+
+data:
+  timestamp_col: t_first        # flow start time
+  packets_col: in_packets       # packets per (sampled) flow
+  src_col: src4_addr            # anonymised source IPv4
+  dst_col: dst4_addr            # anonymised destination IPv4
+  bytes_col: in_bytes           # used if present, ignored otherwise
+  base_bin: 1min                # resolution of the stored packet series
+  # Routers that are always included (chosen in the conference paper + El Paso).
+  fixed_routers: [dallas, atlanta, elpaso]
+  # Fourth router: a router name, or "auto" to pick the lowest-volume router
+  # that has full coverage over the common window (see coverage stage).
+  # On this collection the lowest-volume candidate, Phoenix, is adjacent to
+  # El Paso and carries almost the same traffic (hourly correlation 0.98), so
+  # it is not an independent fourth router; Baton Rouge, the next low-volume
+  # router with complete coverage, is used instead.
+  fourth_router: batonrouge
+  # Routers processed by the ETL and included in the commonality analysis
+  # only (not in the forecasting sweep or the distribution tables).
+  extra_routers: [phoenix]
+  # Candidate filter used when fourth_router is "auto".
+  auto_select:
+    min_day_fraction: 0.95        # fraction of window days that must be "good"
+    min_median_daily_flows: 50000 # avoid routers as sparse as Boston (~7k/day)
+  # A day counts as "good" for a router when both its flow count and its
+  # packet count are at least this fraction of that router's median daily
+  # values. Collection outages and partial first/last days fall below it.
+  good_day_fraction: 0.20
+  # Study window: "auto" = longest run of consecutive good days shared by all
+  # selected routers; or give explicit dates (YYYY-MM-DD, inclusive).
+  window:
+    mode: auto
+    start: null
+    end: null
+    min_days: 21
+
+sweep:
+  windows: [5min, 15min, 30min, 45min, 1h, 2h, 4h, 6h, 12h, 1D]
+  lags_hours: [24, 48, 168]          # lookback (lag) sweep
+  horizons_hours: [1, 6, 12, 24]     # lead times evaluated per run
+  min_lookback_steps: 4              # skip (window, lag) pairs with fewer steps
+  max_lookback_steps: 576            # cap sequence length (e.g. 48 h at 5 min)
+  models: [hybrid_gru_lstm, gru_only, lstm_only, nhits]
+  baselines: [naive_last, snaive_24h]
+  seeds: [0, 1, 2]
+  split: {train: 0.70, val: 0.15, test: 0.15}
+  transform: log1p                   # none | log1p  (applied before scaling)
+  calendar_features: false           # optional hour-of-day / day-of-week covariates (see docs/METHODS.md)
+  loss_on_evaluated_leads: true      # training loss on the evaluated lead times only
+  train:
+    epochs: 100
+    batch_size: 128
+    lr: 0.001
+    patience: 10
+    weight_decay: 0.0
+    num_workers: 0
+  model_params:
+    hybrid_gru_lstm: {gru_units: 64, lstm_units: 256, dense_units: 64, dropout1: 0.25, dropout2: 0.20}
+    gru_only:        {units1: 64, units2: 256, dense_units: 64, dropout1: 0.25, dropout2: 0.20}
+    lstm_only:       {units1: 64, units2: 256, dense_units: 64, dropout1: 0.25, dropout2: 0.20}
+    nhits:
+      n_stacks: 3
+      n_blocks: 1
+      mlp_units: 512
+      mlp_layers: 2
+      pooling_sizes: [8, 4, 1]         # multi-rate input sampling per stack
+      freq_downsample: [24, 12, 1]     # hierarchical interpolation per stack
+      dropout: 0.0
+  save_predictions: true
+  # Headline settings used by the figure stage when one value must be chosen.
+  headline_horizon_hours: 12
+  headline_metric: sMAPE
+
+distribution:
+  weeks: 6                        # number of weekly slices drawn in the CCDF figure (plus "all")
+  flow_sample_size: 2000000       # reservoir sample of flow sizes per router-week
+  powerlaw_xmin: auto             # auto (Clauset et al.) or a number
+  variance_time_scales_min: [1, 2, 5, 10, 15, 30, 60, 120, 240, 360, 720, 1440]
+
+commonality:
+  prefix_len: 16                  # /16 prefix bins
+  top_n: 100                      # top-N prefix sets for Jaccard
+  keep_top_prefixes_per_day: 2000 # stored per router-day-direction
+  hourly_resample: 1h
+  max_xcorr_lag_hours: 6
+
+# Backbone hop counts between router pairs (from the Internet2 map);
+# pairs not listed are reported without a hop count.
+topology:
+  hops:
+    dallas-elpaso: 4
+    dallas-atlanta: 5
+    elpaso-atlanta: 8
+    elpaso-phoenix: 1
+    dallas-phoenix: 5
+    atlanta-phoenix: 9
+    dallas-batonrouge: 2
+    atlanta-batonrouge: 3
+    elpaso-batonrouge: 6
+    phoenix-batonrouge: 7
+
+figures:
+  suptitles: true                 # false for camera-ready figures (captions carry the title)
+  panel_layout: grid              # grid (2x2) or row (1x4, for two-column papers)
+  dpi: 300
+  font_scale: 1.4
+  router_colors: {dallas: "#ff7f0e", atlanta: "#1f77b4", elpaso: "#2ca02c", batonrouge: "#d62728", phoenix: "#9467bd", boston: "#8c564b"}
+  router_labels: {dallas: Dallas, atlanta: Atlanta, elpaso: "El Paso", batonrouge: "Baton Rouge", phoenix: Phoenix, boston: Boston}

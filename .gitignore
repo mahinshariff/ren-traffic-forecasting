@@ -1,0 +1,21 @@
+# outputs and scratch
+outputs/
+slurm_logs/
+run_summary_*.txt
+*.log
+
+# python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.venv/
+.ipynb_checkpoints/
+
+# editors / OS
+.vscode/
+.idea/
+.DS_Store

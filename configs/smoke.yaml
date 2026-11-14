@@ -1,0 +1,65 @@
+# Small configuration for a quick end-to-end test (synthetic data, CPU).
+paths:
+  raw_dir: $RENFC_RAW_DIR
+  out_dir: $RENFC_OUT_DIR
+
+data:
+  timestamp_col: t_first
+  packets_col: in_packets
+  src_col: src4_addr
+  dst_col: dst4_addr
+  bytes_col: in_bytes
+  base_bin: 1min
+  fixed_routers: [dallas, atlanta, elpaso]
+  fourth_router: auto
+  extra_routers: [denver]
+  auto_select: {min_day_fraction: 0.95, min_median_daily_flows: 1000}
+  good_day_fraction: 0.20
+  window: {mode: auto, start: null, end: null, min_days: 7}
+
+sweep:
+  windows: [15min, 1h, 6h, 1D]
+  lags_hours: [24, 48, 168]
+  horizons_hours: [1, 6, 12, 24]
+  min_lookback_steps: 4
+  max_lookback_steps: 576
+  models: [hybrid_gru_lstm, gru_only, lstm_only, nhits]
+  baselines: [naive_last, snaive_24h]
+  seeds: [0]
+  split: {train: 0.70, val: 0.15, test: 0.15}
+  transform: log1p
+  calendar_features: true
+  loss_on_evaluated_leads: true
+  train: {epochs: 3, batch_size: 64, lr: 0.001, patience: 3, weight_decay: 0.0, num_workers: 0}
+  model_params:
+    hybrid_gru_lstm: {gru_units: 16, lstm_units: 32, dense_units: 16, dropout1: 0.25, dropout2: 0.20}
+    gru_only:        {units1: 16, units2: 32, dense_units: 16, dropout1: 0.25, dropout2: 0.20}
+    lstm_only:       {units1: 16, units2: 32, dense_units: 16, dropout1: 0.25, dropout2: 0.20}
+    nhits: {n_stacks: 3, n_blocks: 1, mlp_units: 64, mlp_layers: 2, pooling_sizes: [8, 4, 1], freq_downsample: [24, 12, 1], dropout: 0.0}
+  save_predictions: true
+  headline_horizon_hours: 12
+  headline_metric: sMAPE
+
+distribution:
+  weeks: 2
+  flow_sample_size: 200000
+  powerlaw_xmin: auto
+  variance_time_scales_min: [1, 2, 5, 10, 15, 30, 60, 120, 240, 360, 720, 1440]
+
+commonality:
+  prefix_len: 16
+  top_n: 100
+  keep_top_prefixes_per_day: 500
+  hourly_resample: 1h
+  max_xcorr_lag_hours: 6
+
+topology:
+  hops: {dallas-elpaso: 4}
+
+figures:
+  suptitles: true                 # false for camera-ready figures (captions carry the title)
+  panel_layout: grid              # grid (2x2) or row (1x4, for two-column papers)
+  dpi: 120
+  font_scale: 1.2
+  router_colors: {dallas: "#ff7f0e", atlanta: "#1f77b4", elpaso: "#2ca02c", boston: "#d62728"}
+  router_labels: {dallas: Dallas, atlanta: Atlanta, elpaso: "El Paso", boston: Boston}

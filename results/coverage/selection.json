@@ -1,0 +1,13 @@
+{
+  "routers": [
+    "dallas",
+    "atlanta",
+    "elpaso",
+    "batonrouge"
+  ],
+  "fourth_router": "batonrouge",
+  "window_start": "2021-10-08",
+  "window_end": "2021-11-19",
+  "n_days": 43,
+  "candidates": []
+}
